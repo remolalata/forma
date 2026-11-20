@@ -30,6 +30,22 @@ The project filters, expanded collection, case study dialogs, service accordion,
 
 No backend, database, API calls, or external runtime assets are required. All mock data is imported from JSON at build time.
 
+## Visual screenshots in GitHub Actions
+
+The workflow at `.github/workflows/visual-ux-screenshots.yml` captures screenshots after Vercel emits `vercel.deployment.success` for a preview of the `forma` project. It reads the URL and commit SHA from that event and checks out the deployed commit. Production deployments and other Vercel projects are ignored. This runs for successful previews, including previews outside pull requests.
+
+The workflow does not poll GitHub Deployment records. A successful `Vercel` commit status can exist without those records, which caused the previous wait step to time out.
+
+To enable automatic captures:
+
+1. Commit and push the updated workflow yourself, and merge it into the repository's default branch. GitHub only receives `repository_dispatch` workflows from that branch.
+2. Trigger a new Vercel preview deployment. Existing deployments and reruns of the old screenshot workflow do not pick up this local change.
+3. Open the new **Visual UX Screenshots** run and download its `ux-screenshots` artifact.
+
+Once the workflow is available on the default branch, you can also choose **Actions → Visual UX Screenshots → Run workflow**. Supply the ready preview's HTTPS URL and its exact 40-character commit SHA. The manual option captures an existing preview without waiting for another deployment event.
+
+The dispatch payload and trigger follow [Vercel's GitHub Actions guidance](https://vercel.com/docs/git/vercel-for-github#run-end-to-end-tests-after-a-deployment). GitHub Actions must be able to open the preview URL; a protected deployment may require Vercel's automation access configuration.
+
 ## Assets
 
 Photos are downloaded from [Unsplash](https://unsplash.com) and served locally under `public/images`, with explicit image dimensions, optimized sizes, and lazy loading below the hero. Unsplash photography is covered by the [Unsplash License](https://unsplash.com/license).
