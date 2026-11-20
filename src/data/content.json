@@ -1,0 +1,14 @@
+{
+  "navigation": [
+    { "label": "Our work", "href": "#work" },
+    { "label": "What we do", "href": "#services" },
+    { "label": "The studio", "href": "#about" }
+  ],
+  "filters": ["All work", "Branding", "Web design", "Digital products"],
+  "services": [
+    { "id": "brand-strategy", "title": "Brand strategy", "description": "Find the thing that makes you, you. We turn your ambition into a clear direction, with a voice and a story that feel true to your brand.", "tags": ["Positioning", "Brand narrative", "Creative direction"] },
+    { "id": "visual-identity", "title": "Visual identity", "description": "Distinctive identities with room to grow. From your first impression to the smallest detail, we create a visual language that holds everything together.", "tags": ["Identity systems", "Typography", "Brand guidelines"] },
+    { "id": "digital-experiences", "title": "Digital experiences", "description": "Clear, intuitive websites and digital products. We balance personality with purpose to make every interaction feel natural.", "tags": ["Web design", "UI / UX", "Design systems"] },
+    { "id": "ongoing-partnership", "title": "Ongoing partnership", "description": "Good design keeps evolving. We work alongside your team to bring consistency and fresh thinking to whatever comes next.", "tags": ["Design support", "Creative collaboration", "Brand evolution"] }
+  ]
+}
