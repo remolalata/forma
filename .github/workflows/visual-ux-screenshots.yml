@@ -1,0 +1,84 @@
+
+name: Visual UX Screenshots
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "tests/visual-review.spec.ts"
+      - ".github/workflows/visual-ux-screenshots.yml"
+      - "package.json"
+      - "package-lock.json"
+
+permissions:
+  contents: read
+  deployments: read
+  statuses: read
+
+concurrency:
+  group: visual-ux-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  capture-screenshots:
+    if: >-
+      ${{
+        !github.event.pull_request.draft &&
+        github.event.pull_request.head.repo.full_name == github.repository
+      }}
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # 1. Download the PR code
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # 2. Wait for the correct Vercel deployment
+      - name: Wait for Vercel preview
+        id: vercel
+        uses: vercel/wait-for-deployment-action@main
+        with:
+          environment: preview
+          sha: ${{ github.event.pull_request.head.sha }}
+          timeout: 600
+          require-deployment-id: false
+
+      # 3. Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # 4. Install project dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 5. Install Chromium
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # 6. Capture screenshots
+      - name: Capture screenshots
+        env:
+          PREVIEW_URL: ${{ steps.vercel.outputs.deployment-url }}
+        run: |
+          mkdir -p screenshots
+          npx playwright test tests/visual-review.spec.ts --workers=1
+
+      # 7. Save screenshots to GitHub
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ux-screenshots
+          path: screenshots/*.png
+          if-no-files-found: warn
+          retention-days: 7
