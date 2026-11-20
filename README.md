@@ -1,75 +1,65 @@
-# React + TypeScript + Vite
+# Forma — Independent Design Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive homepage for a fictional design studio, built with React 19, TypeScript, and Vite. The editorial layout uses locally hosted DM Sans, optimized Unsplash photography, a consistent charcoal and lime palette, and reusable UI components.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm run build       # TypeScript checks and production build
+npm run preview     # Preview the production build
+npm run format      # Format source files
+npm run format:check
 ```
+
+## Content and components
+
+- `src/data/content.json`: navigation, project filters, and service descriptions.
+- `src/data/projects.json`: mock projects, image paths, categories, and case study content.
+- `src/components/ui.tsx`: reusable buttons, brand mark, icons, and section headings.
+- `src/components/Modal.tsx`: native accessible dialog with Escape support, focus restoration, and background scroll locking.
+- `src/App.tsx`: homepage sections and client-side interactions.
+- `src/index.css`: design tokens, locally hosted font, global styles, and reduced motion support.
+- `src/App.css`: component styles and responsive layouts.
+
+The project filters, expanded collection, case study dialogs, service accordion, and mobile navigation run entirely in the browser. The inquiry form uses native validation and saves one inquiry to browser local storage under `forma-inquiry`. It never sends data. The UI explicitly identifies the site and projects as concepts.
+
+No backend, database, API calls, or external runtime assets are required. All mock data is imported from JSON at build time.
+
+## Visual screenshots in GitHub Actions
+
+The workflow at `.github/workflows/visual-ux-screenshots.yml` runs whenever a pull request is opened, updated with new commits, reopened, or marked ready for review. There are no branch or path filters, and draft or fork pull requests are not excluded. GitHub may require maintainer approval before running workflows from forks.
+
+CI checks out the PR's head commit, installs dependencies, builds the app, and installs Chromium. Playwright starts the production preview on the runner at `http://127.0.0.1:4173`, waits for the server, captures desktop and mobile screenshots, and shuts the server down. Download the `ux-screenshots` artifact from the workflow run.
+
+Vercel deployments and GitHub Deployment records are not required. Commit and push the updated files to your PR branch to start a new run; there is no need to merge the workflow into the default branch first for PR runs. The optional **Run workflow** button is available after the workflow is on the default branch.
+
+To run the same checks locally:
+
+```sh
+npx playwright install chromium
+npm run build
+npx playwright test tests/visual-review.spec.ts
+```
+
+For an existing hosted preview, you can still set `PREVIEW_URL` when running Playwright locally. That overrides the base URL and skips starting the local preview server.
+
+The server lifecycle uses Playwright's [`webServer` configuration](https://playwright.dev/docs/test-webserver).
+
+## Assets
+
+Photos are downloaded from [Unsplash](https://unsplash.com) and served locally under `public/images`, with explicit image dimensions, optimized sizes, and lazy loading below the hero. Unsplash photography is covered by the [Unsplash License](https://unsplash.com/license).
+
+- Hero and Form Journal: [source photograph](https://images.unsplash.com/photo-1487958449943-2429e8be8625).
+- Mono Architecture: [photograph by Yaosheng Zheng](https://unsplash.com/photos/pQOqQpweE98).
+- Still Living: [source photograph](https://images.unsplash.com/photo-1600210492486-724fe5c67fb0).
+- Olive Wellness artwork: original HTML/CSS composition.
+- DM Sans: [Google Fonts source](https://github.com/google/fonts/tree/main/ofl/dmsans), licensed under the SIL Open Font License. A copy is included at `public/fonts/OFL.txt`.
+
+## Accessibility
+
+Semantic landmarks and headings, a skip link, visible focus indicators, native buttons, labeled inputs, descriptive image alternatives, accessible toggle states, native modal focus containment, and reduced motion styles support keyboard and assistive technology use. Layouts adapt from narrow mobile screens to wide desktop viewports.

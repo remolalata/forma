@@ -1,6 +1,58 @@
 [
-  { "id": "mono", "title": "Mono Architecture", "subtitle": "A new perspective on the built world.", "category": "Web design", "visual": "architecture", "image": "/images/architecture.jpg", "alt": "Interlocking concrete architectural forms against a pale sky", "description": "An architectural practice imagined around a simple idea: make space for what matters. This concept pairs a confident editorial identity with a considered web experience.", "approach": "We built the direction around scale, space, and texture. Oversized type and generous margins give the photography room to speak, while clear navigation keeps the portfolio easy to explore.", "tags": ["Creative direction", "Web design", "UI / UX"] },
-  { "id": "olive", "title": "Olive Wellness", "subtitle": "Wellbeing, with a little more personality.", "category": "Branding", "visual": "wellness", "image": "", "alt": "Olive brand identity in soft green and cream", "description": "A warm, optimistic identity for an imagined wellness brand. Olive moves away from perfection and makes room for a more personal, everyday approach to feeling good.", "approach": "An expressive symbol, a grounding green palette, and friendly typography bring the brand to life. The identity is designed to feel equally at home on packaging, a website, or a little note of encouragement.", "tags": ["Brand strategy", "Visual identity", "Art direction"] },
-  { "id": "still", "title": "Still Living", "subtitle": "Thoughtful spaces. Everyday moments.", "category": "Digital products", "visual": "interior", "image": "/images/interior.jpg", "alt": "Light-filled living room with natural materials and soft neutral furniture", "description": "An imagined interior discovery platform for people who appreciate a slower pace. Still Living makes exploring thoughtful spaces feel as calm as the spaces themselves.", "approach": "We kept the experience simple: beautiful photography, useful details, and an intuitive path from inspiration to exploration. A quiet visual system brings consistency to every screen.", "tags": ["Product strategy", "UI / UX", "Design system"] },
-  { "id": "form", "title": "Form Journal", "subtitle": "A quieter space for creative thinking.", "category": "Web design", "visual": "architecture", "image": "/images/hero-architecture.jpg", "alt": "White sculptural building beneath a blue sky", "description": "A digital journal concept exploring architecture, design, and everyday creativity. The reading experience puts thoughtful stories and striking imagery first.", "approach": "A restrained grid and generous typography create a flexible editorial system. The design gives both short observations and long-form stories a comfortable place to live.", "tags": ["Editorial design", "Web design", "Art direction"] }
+  {
+    "id": "mono",
+    "wordmark": "MONO",
+    "wordmarkTagline": "ARCHITECTURE, CONSIDERED.",
+    "title": "Mono Architecture",
+    "subtitle": "A new perspective on the built world.",
+    "category": "Web design",
+    "visual": "architecture",
+    "image": "/images/architecture.jpg",
+    "alt": "Interlocking concrete architectural forms against a pale sky",
+    "description": "An architectural practice imagined around a simple idea: make space for what matters. This concept pairs a confident editorial identity with a considered web experience.",
+    "approach": "We built the direction around scale, space, and texture. Oversized type and generous margins give the photography room to speak, while clear navigation keeps the portfolio easy to explore.",
+    "tags": ["Creative direction", "Web design", "UI / UX"]
+  },
+  {
+    "id": "olive",
+    "wordmark": "olive.",
+    "wordmarkTagline": "A LITTLE MORE YOU.",
+    "title": "Olive Wellness",
+    "subtitle": "Wellbeing, with a little more personality.",
+    "category": "Branding",
+    "visual": "wellness",
+    "image": "",
+    "alt": "Olive brand identity in soft green and cream",
+    "description": "A warm, optimistic identity for an imagined wellness brand. Olive moves away from perfection and makes room for a more personal, everyday approach to feeling good.",
+    "approach": "An expressive symbol, a grounding green palette, and friendly typography bring the brand to life. The identity is designed to feel equally at home on packaging, a website, or a little note of encouragement.",
+    "tags": ["Brand strategy", "Visual identity", "Art direction"]
+  },
+  {
+    "id": "still",
+    "wordmark": "still",
+    "wordmarkTagline": "ROOM TO JUST BE.",
+    "title": "Still Living",
+    "subtitle": "Thoughtful spaces. Everyday moments.",
+    "category": "Digital products",
+    "visual": "interior",
+    "image": "/images/interior.jpg",
+    "alt": "Light-filled living room with natural materials and soft neutral furniture",
+    "description": "An imagined interior discovery platform for people who appreciate a slower pace. Still Living makes exploring thoughtful spaces feel as calm as the spaces themselves.",
+    "approach": "We kept the experience simple: beautiful photography, useful details, and an intuitive path from inspiration to exploration. A quiet visual system brings consistency to every screen.",
+    "tags": ["Product strategy", "UI / UX", "Design system"]
+  },
+  {
+    "id": "form",
+    "wordmark": "FORM",
+    "wordmarkTagline": "A JOURNAL FOR CURIOUS MINDS.",
+    "title": "Form Journal",
+    "subtitle": "A quieter space for creative thinking.",
+    "category": "Web design",
+    "visual": "architecture",
+    "image": "/images/hero-architecture.jpg",
+    "alt": "White sculptural building beneath a pale, cloud-filled sky",
+    "description": "A digital journal concept exploring architecture, design, and everyday creativity. The reading experience puts thoughtful stories and striking imagery first.",
+    "approach": "A restrained grid and generous typography create a flexible editorial system. The design gives both short observations and long-form stories a comfortable place to live.",
+    "tags": ["Editorial design", "Web design", "Art direction"]
+  }
 ]
