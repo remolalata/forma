@@ -32,19 +32,23 @@ No backend, database, API calls, or external runtime assets are required. All mo
 
 ## Visual screenshots in GitHub Actions
 
-The workflow at `.github/workflows/visual-ux-screenshots.yml` captures screenshots after Vercel emits `vercel.deployment.success` for a preview of the `forma` project. It reads the URL and commit SHA from that event and checks out the deployed commit. Production deployments and other Vercel projects are ignored. This runs for successful previews, including previews outside pull requests.
+The workflow at `.github/workflows/visual-ux-screenshots.yml` runs whenever a pull request is opened, updated with new commits, reopened, or marked ready for review. There are no branch or path filters, and draft or fork pull requests are not excluded. GitHub may require maintainer approval before running workflows from forks.
 
-The workflow does not poll GitHub Deployment records. A successful `Vercel` commit status can exist without those records, which caused the previous wait step to time out.
+CI checks out the PR's head commit, installs dependencies, builds the app, and installs Chromium. Playwright starts the production preview on the runner at `http://127.0.0.1:4173`, waits for the server, captures desktop and mobile screenshots, and shuts the server down. Download the `ux-screenshots` artifact from the workflow run.
 
-To enable automatic captures:
+Vercel deployments and GitHub Deployment records are not required. Commit and push the updated files to your PR branch to start a new run; there is no need to merge the workflow into the default branch first for PR runs. The optional **Run workflow** button is available after the workflow is on the default branch.
 
-1. Commit and push the updated workflow yourself, and merge it into the repository's default branch. GitHub only receives `repository_dispatch` workflows from that branch.
-2. Trigger a new Vercel preview deployment. Existing deployments and reruns of the old screenshot workflow do not pick up this local change.
-3. Open the new **Visual UX Screenshots** run and download its `ux-screenshots` artifact.
+To run the same checks locally:
 
-Once the workflow is available on the default branch, you can also choose **Actions → Visual UX Screenshots → Run workflow**. Supply the ready preview's HTTPS URL and its exact 40-character commit SHA. The manual option captures an existing preview without waiting for another deployment event.
+```sh
+npx playwright install chromium
+npm run build
+npx playwright test tests/visual-review.spec.ts
+```
 
-The dispatch payload and trigger follow [Vercel's GitHub Actions guidance](https://vercel.com/docs/git/vercel-for-github#run-end-to-end-tests-after-a-deployment). GitHub Actions must be able to open the preview URL; a protected deployment may require Vercel's automation access configuration.
+For an existing hosted preview, you can still set `PREVIEW_URL` when running Playwright locally. That overrides the base URL and skips starting the local preview server.
+
+The server lifecycle uses Playwright's [`webServer` configuration](https://playwright.dev/docs/test-webserver).
 
 ## Assets
 
