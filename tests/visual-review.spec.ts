@@ -6,7 +6,7 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`Capture ${viewport.name} screenshot`, async ({ page }) => {
+  test(`Capture ${viewport.name} screenshot`, async ({ page }, testInfo) => {
     await page.setViewportSize({
       width: viewport.width,
       height: viewport.height,
@@ -16,13 +16,24 @@ for (const viewport of viewports) {
       waitUntil: "domcontentloaded",
     });
 
-    // Wait for the React application to render.
-    await expect(page.locator("#root")).not.toBeEmpty({
+    // Confirm the homepage rendered rather than capturing a login or error page.
+    await expect(page.locator("#hero-title")).toBeVisible({
       timeout: 15000,
     });
 
+    // Full-page captures must also include images outside the viewport.
+    await page.locator("img").evaluateAll((images) => {
+      for (const image of images) image.setAttribute("loading", "eager");
+    });
+    for (const image of await page.locator("img").all()) {
+      await expect(image).toHaveJSProperty("complete", true, {
+        timeout: 15000,
+      });
+      await expect(image).not.toHaveJSProperty("naturalWidth", 0);
+    }
+
     await page.screenshot({
-      path: `screenshots/${viewport.name}.png`,
+      path: `screenshots/${testInfo.project.name}/${viewport.name}.png`,
       fullPage: true,
       animations: "disabled",
     });

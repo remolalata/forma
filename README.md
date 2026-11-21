@@ -34,9 +34,9 @@ No backend, database, API calls, or external runtime assets are required. All mo
 
 The workflow at `.github/workflows/visual-ux-screenshots.yml` runs whenever a pull request is opened, updated with new commits, reopened, or marked ready for review. There are no branch or path filters, and draft or fork pull requests are not excluded. GitHub may require maintainer approval before running workflows from forks.
 
-CI checks out the PR's head commit, installs dependencies, builds the app, and installs Chromium. Playwright starts the production preview on the runner at `http://127.0.0.1:4173`, waits for the server, captures desktop and mobile screenshots, and shuts the server down. Download the `ux-screenshots` artifact from the workflow run.
+CI checks out the PR's head commit, installs dependencies, validates the build, and installs Chromium. Playwright captures the hosted master baseline at `https://forma-mu-beige.vercel.app/` and the hosted PR preview at `https://forma-git-dev-remo-antonio-lalatas-projects.vercel.app/`. Both versions use identical desktop (1440 × 900) and mobile (375 × 812) sizes. Download the `ux-screenshots` artifact from the workflow run.
 
-Vercel deployments and GitHub Deployment records are not required. Commit and push the updated files to your PR branch to start a new run; there is no need to merge the workflow into the default branch first for PR runs. The optional **Run workflow** button is available after the workflow is on the default branch.
+Both hosted URLs must be reachable and contain the versions you want to compare. The workflow does not start a local server or poll GitHub Deployment records. Commit and push the updated files to your PR branch to start a new run; there is no need to merge the workflow into the default branch first for PR runs. The optional **Run workflow** button is available after the workflow is on the default branch.
 
 To run the same checks locally:
 
@@ -46,9 +46,27 @@ npm run build
 npx playwright test tests/visual-review.spec.ts
 ```
 
-For an existing hosted preview, you can still set `PREVIEW_URL` when running Playwright locally. That overrides the base URL and skips starting the local preview server.
+The output separates the master baseline from the PR under review:
 
-The server lifecycle uses Playwright's [`webServer` configuration](https://playwright.dev/docs/test-webserver).
+```text
+screenshots/
+├── master/
+│   ├── desktop.png
+│   └── mobile.png
+└── pr/
+    ├── desktop.png
+    └── mobile.png
+```
+
+The provided URLs are the defaults. To override them explicitly:
+
+```sh
+MASTER_URL="https://forma-mu-beige.vercel.app/" \
+PR_URL="https://forma-git-dev-remo-antonio-lalatas-projects.vercel.app/" \
+npx playwright test tests/visual-review.spec.ts
+```
+
+`MASTER_URL` overrides the baseline URL. `PR_URL` (or the existing `PREVIEW_URL` alias) overrides the PR URL. These branch/domain URLs capture whatever is currently deployed there; the supplied PR URL follows the `dev` branch. Ensure the intended Vercel preview is ready before reviewing its screenshots, and override `PR_URL` for another PR branch. The test requires the homepage heading to render, so authentication or error pages fail instead of becoming screenshot artifacts.
 
 ## Assets
 

@@ -1,7 +1,11 @@
 import { defineConfig } from "@playwright/test";
 
-const localPreviewUrl = "http://127.0.0.1:4173";
-const externalPreviewUrl = process.env.PREVIEW_URL;
+const masterUrl =
+  process.env.MASTER_URL || "https://forma-mu-beige.vercel.app/";
+const prUrl =
+  process.env.PR_URL ||
+  process.env.PREVIEW_URL ||
+  "https://forma-git-dev-remo-antonio-lalatas-projects.vercel.app/";
 
 export default defineConfig({
   testDir: "./tests",
@@ -9,14 +13,12 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   use: {
     browserName: "chromium",
-    baseURL: externalPreviewUrl || localPreviewUrl,
   },
-  webServer: externalPreviewUrl
-    ? undefined
-    : {
-        command: "npm run preview -- --host 127.0.0.1 --port 4173 --strictPort",
-        url: localPreviewUrl,
-        reuseExistingServer: false,
-        timeout: 60_000,
-      },
+  projects: [
+    { name: "master", use: { baseURL: masterUrl } },
+    {
+      name: "pr",
+      use: { baseURL: prUrl },
+    },
+  ],
 });
