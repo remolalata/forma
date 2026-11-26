@@ -32,7 +32,11 @@ No backend, database, API calls, or external runtime assets are required. All mo
 
 ## Visual screenshots in GitHub Actions
 
-The workflow at `.github/workflows/visual-ux-screenshots.yml` runs whenever a pull request is opened, updated with new commits, reopened, or marked ready for review. There are no branch or path filters, and draft or fork pull requests are not excluded. GitHub may require maintainer approval before running workflows from forks.
+The workflow at `.github/workflows/visual-ux-screenshots.yml` captures screenshots when a non-draft pull request from this repository is opened, updated with new commits, reopened, or marked ready for review. Adding the `ai-ux-review` label also captures screenshots. Other label events skip both jobs, and draft and fork PRs are excluded. Manual `workflow_dispatch` runs still capture screenshots.
+
+The separate `trigger-grok` job sends a review request only when `ai-ux-review` is added and screenshot capture, verification of all four PNGs, and artifact upload succeed. Ordinary pushes do not request AI reviews, even if the PR already has the label. Routine runs, AI-review label runs, and unrelated label runs use separate concurrency groups. To request another AI review after a later change, remove and re-add the label.
+
+Configure the repository secrets `GROK_BOT_WEBHOOK_URL` and `GROK_BOT_WEBHOOK_KEY` before requesting an AI review. They are passed only to the webhook step in the separate job, which does not check out or execute application code. The bot receives the PR metadata, head SHA, workflow run URL, and `ux-screenshots` artifact name; it needs its own access to download the artifact. The webhook request times out after 15 seconds and fails on a non-success HTTP status.
 
 CI checks out the PR's head commit, installs dependencies, validates the build, and installs Chromium. Playwright captures the hosted master baseline at `https://forma-mu-beige.vercel.app/` and the hosted PR preview at `https://forma-git-dev-remo-antonio-lalatas-projects.vercel.app/`. Both versions use identical desktop (1440 × 900) and mobile (375 × 812) sizes. Download the `ux-screenshots` artifact from the workflow run.
 
