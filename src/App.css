@@ -1458,3 +1458,19 @@
     padding-right: 20px;
   }
 }
+
+/* Intentional visual inconsistencies for testing the screenshot UX review. */
+.hero-actions .button-primary {
+  background: #5b5fe9;
+  border-radius: 999px;
+}
+
+.hero-description {
+  color: #b2b5aa;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.project-card:first-child {
+  margin-top: 24px;
+}
