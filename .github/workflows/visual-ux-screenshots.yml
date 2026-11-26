@@ -1,0 +1,159 @@
+name: Visual UX Screenshots
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Unrelated labels cannot cancel screenshots or an explicit AI review request.
+  group: >-
+    visual-ux-${{ github.event.pull_request.number || github.ref }}-${{
+      github.event.action == 'labeled' &&
+      (github.event.label.name == 'ai-ux-review' && 'ai-review' || 'other-label') ||
+      'screenshots'
+    }}
+  cancel-in-progress: true
+
+jobs:
+  capture-screenshots:
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event_name == 'pull_request' &&
+          !github.event.pull_request.draft &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          (
+            github.event.action != 'labeled' ||
+            github.event.label.name == 'ai-ux-review'
+          )
+        )
+      }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      artifact_id: ${{ steps.upload-screenshots.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Capture screenshots
+        run: |
+          mkdir -p screenshots
+          npx playwright test tests/visual-review.spec.ts --workers=1
+
+      - name: Verify all four screenshots
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+
+          const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+          for (const version of ['master', 'pr']) {
+            for (const viewport of ['desktop', 'mobile']) {
+              const path = `screenshots/${version}/${viewport}.png`;
+              const image = await readFile(path);
+              if (!image.subarray(0, 8).equals(pngSignature) || image.length <= 8) {
+                throw new Error(`Missing or invalid screenshot: ${path}`);
+              }
+            }
+          }
+          console.log('Verified all four screenshots');
+          NODE
+
+      - name: Upload screenshots
+        id: upload-screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ux-screenshots
+          path: screenshots/**/*.png
+          if-no-files-found: error
+          retention-days: 7
+
+  trigger-grok:
+    name: Trigger Grok Bot UX Review
+    needs: capture-screenshots
+    if: >-
+      ${{
+        github.event_name == 'pull_request' &&
+        github.event.action == 'labeled' &&
+        github.event.label.name == 'ai-ux-review' &&
+        needs.capture-screenshots.result == 'success' &&
+        needs.capture-screenshots.outputs.artifact_id != ''
+      }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Send review request to Grok Bot
+        env:
+          WEBHOOK_URL: ${{ secrets.GROK_BOT_WEBHOOK_URL }}
+          WEBHOOK_KEY: ${{ secrets.GROK_BOT_WEBHOOK_KEY }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          node --input-type=module <<'NODE'
+          const env = process.env;
+
+          if (!env.WEBHOOK_URL || !env.WEBHOOK_KEY) {
+            throw new Error("Missing Grok Bot webhook credentials");
+          }
+
+          const payload = {
+            mode: "review_pr",
+            repository: env.REPOSITORY,
+            pr_number: Number(env.PR_NUMBER),
+            pr_url: env.PR_URL,
+            head_sha: env.HEAD_SHA,
+            workflow_run_url: env.RUN_URL,
+            artifact_name: "ux-screenshots"
+          };
+
+          const response = await fetch(env.WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${env.WEBHOOK_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(15000)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Webhook failed: HTTP ${response.status}`);
+          }
+
+          console.log("Grok Bot accepted the review request");
+          NODE
